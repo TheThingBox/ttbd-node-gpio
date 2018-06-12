@@ -1,0 +1,20 @@
+{
+  "name": "ttbd-node-gpio",
+  "version": "0.1.0",
+  "description": "This node allows setup rpi gpio for TheThingBox.",
+  "node-red": {
+    "nodes": {
+      "rpi-gpio": "rpi-gpio.js"
+    }
+  },
+  "keywords": [
+    "thethingbox",
+    "Node-RED",
+    "rpi-gpio"
+  ],
+  "dependencies": {
+    "mqtt": "2.18.0"
+  },
+  "author": "digitalairways.com",
+  "license": "http://www.wtfpl.net"
+}
