@@ -18,6 +18,50 @@ module.exports = function(RED) {
     // the magic to make python print stuff immediately
     process.env.PYTHONUNBUFFERED = 1;
 
+    var gpioMapping = [
+      { pin: 0,  gpio: null},
+      { pin: 1,  gpio: null},
+      { pin: 2,  gpio: null},
+      { pin: 3,  gpio: 2},
+      { pin: 4,  gpio: null},
+      { pin: 5,  gpio: 3},
+      { pin: 6,  gpio: null},
+      { pin: 7,  gpio: 4},
+      { pin: 8,  gpio: 14},
+      { pin: 9,  gpio: null},
+      { pin: 10, gpio: 15},
+      { pin: 11, gpio: 17},
+      { pin: 12, gpio: 18},
+      { pin: 13, gpio: 27},
+      { pin: 14, gpio: null},
+      { pin: 15, gpio: 22},
+      { pin: 16, gpio: 23},
+      { pin: 17, gpio: null},
+      { pin: 18, gpio: 24},
+      { pin: 19, gpio: 10},
+      { pin: 20, gpio: null},
+      { pin: 21, gpio: 9},
+      { pin: 22, gpio: 25},
+      { pin: 23, gpio: 11},
+      { pin: 24, gpio: 8},
+      { pin: 25, gpio: null},
+      { pin: 26, gpio: 7},
+      { pin: 27, gpio: null},
+      { pin: 28, gpio: null},
+      { pin: 29, gpio: 5},
+      { pin: 30, gpio: null},
+      { pin: 31, gpio: 6},
+      { pin: 32, gpio: 12},
+      { pin: 33, gpio: 13},
+      { pin: 34, gpio: null},
+      { pin: 35, gpio: 19},
+      { pin: 36, gpio: 16},
+      { pin: 37, gpio: 26},
+      { pin: 38, gpio: 20},
+      { pin: 39, gpio: null},
+      { pin: 40, gpio: 21}
+    ]
+
     var pinsInUse = {};
     var pinTypes = {"out":RED._("rpi-gpio.types.digout"), "tri":RED._("rpi-gpio.types.input"), "up":RED._("rpi-gpio.types.pullup"), "down":RED._("rpi-gpio.types.pulldown"), "pwm":RED._("rpi-gpio.types.pwmout")};
 
@@ -40,8 +84,8 @@ module.exports = function(RED) {
 
         if (node.pin !== undefined) {
             this.client.on('connect', () => {
-                this.client.subscribe(`tsa/gpio/${node.pin}/value`)
-                this.client.publish(`tsa/gpio/${node.pin}/setup`, JSON.stringify({
+                this.client.subscribe(`tsa/gpio/${gpioMapping[node.pin].gpio}/value`)
+                this.client.publish(`tsa/gpio/${gpioMapping[node.pin].gpio}/setup`, JSON.stringify({
                     mode: 'in'
                 }))
 
@@ -50,7 +94,7 @@ module.exports = function(RED) {
 
             this.client.on('message', (topic, message) => {
                 message = Number(message.toString())
-                if(topic === `tsa/gpio/${node.pin}/value`){
+                if(topic === `tsa/gpio/${gpioMapping[node.pin].gpio}/value`){
                     if(node.buttonState !== -1 && !isNaN(message) && node.buttonState !== message){
                         node.send({ topic:`pi/${node.pin}`, payload:message, intent:((message===0)?0:1) });
                     }
@@ -68,7 +112,7 @@ module.exports = function(RED) {
             node.status({fill:"grey",shape:"ring",text:"rpi-gpio.status.closed"});
             delete pinsInUse[node.pin];
             if (this.client) {
-                this.client.unsubscribe(`tsa/gpio/${node.pin}/value`)
+                this.client.unsubscribe(`tsa/gpio/${gpioMapping[node.pin].gpio}/value`)
                 this.client.end()
             }
             done();
@@ -79,7 +123,8 @@ module.exports = function(RED) {
     function GPIOOutNode(n) {
         RED.nodes.createNode(this,n);
         this.pin = n.pin;
-        this.set = n.set || false;
+        this.set = n.set || false;;
+        this.level = Number(n.level) || 0;
         this.client = mqtt.connect(mqtt_option.get_url())
         var node = this;
         if (!pinsInUse.hasOwnProperty(this.pin)) {
@@ -93,9 +138,13 @@ module.exports = function(RED) {
 
         if (node.pin !== undefined) {
             this.client.on('connect', () => {
-                this.client.publish(`tsa/gpio/${node.pin}/setup`, JSON.stringify({
+                var setupParams = {
                     mode: 'out'
-                }))
+                }
+                if(node.set){
+                  setupParams.initial = node.level
+                }
+                this.client.publish(`tsa/gpio/${gpioMapping[node.pin].gpio}/setup`, JSON.stringify(setupParams))
 
                 node.status({fill:"green",shape:"dot",text:"rpi-gpio.status.ok"});
                 node.on("input", function(msg){
@@ -111,7 +160,7 @@ module.exports = function(RED) {
                     }
                     var limit = 1;
                     if ((out >= 0) && (out <= limit)) {
-                        this.client.publish(`tsa/gpio/${node.pin}/value/set`, `${out}`)
+                        this.client.publish(`tsa/gpio/${gpioMapping[node.pin].gpio}/value/set`, `${out}`)
                         node.status({fill:"green",shape:"dot",text:`${out}`});
                     }
                     else { node.warn(RED._("rpi-gpio.errors.invalidinput")+": "+out); }
