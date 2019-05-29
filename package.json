@@ -12,7 +12,8 @@
     "rpi-gpio"
   ],
   "dependencies": {
-    "mqtt": "2.18.0"
+    "is-utf8": "0.2.1",
+    "mustache": "3.0.1"
   },
   "author": "digitalairways.com",
   "license": "http://www.wtfpl.net"

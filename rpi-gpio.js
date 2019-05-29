@@ -1,22 +1,8 @@
 
 module.exports = function(RED) {
     "use strict";
-    var exec = require('child_process').exec;
-    var spawn = require('child_process').spawn;
-    var mqtt = require("mqtt")
     var fs = require("fs")
-    var mqtt_option = {
-        protocol: 'mqtt',
-        host: 'mosquitto',
-        port: 1883,
-        get_url: function(){
-          return `${this.protocol}://${this.host}:${this.port}`
-        }
-    }
-
-
-    // the magic to make python print stuff immediately
-    process.env.PYTHONUNBUFFERED = 1;
+    var isUtf8 = require('is-utf8');
 
     var gpioMapping = [
       { pin: 0,  gpio: null},
@@ -66,122 +52,142 @@ module.exports = function(RED) {
     var pinTypes = {"out":RED._("rpi-gpio.types.digout"), "tri":RED._("rpi-gpio.types.input"), "up":RED._("rpi-gpio.types.pullup"), "down":RED._("rpi-gpio.types.pulldown"), "pwm":RED._("rpi-gpio.types.pwmout")};
 
     function GPIOInNode(n) {
-        RED.nodes.createNode(this,n);
-        this.buttonState = -1;
-        this.pin = n.pin;
-        this.read = n.read || false;
-        this.client = mqtt.connect(mqtt_option.get_url())
-        if (this.read) { this.buttonState = -2; }
-        var node = this;
-        if (!pinsInUse.hasOwnProperty(this.pin)) {
-            pinsInUse[this.pin] = "in";
-        }
-        else {
-            if ((pinsInUse[this.pin] !== "in")||(pinsInUse[this.pin] === "pwm")) {
-                node.warn(RED._("rpi-gpio.errors.alreadyset",{pin:this.pin,type:pinTypes[pinsInUse[this.pin]]}));
-            }
+      RED.nodes.createNode(this,n);
+      this.buttonState = -1;
+      this.pin = n.pin;
+      this.read = n.read || false;
+      this.broker = n.broker;
+      this.brokerConn = RED.nodes.getNode(this.broker);
+      if (this.read) { this.buttonState = -2; }
+      var node = this;
+      if(!pinsInUse.hasOwnProperty(this.pin)) {
+        pinsInUse[this.pin] = "in";
+      } else if((pinsInUse[this.pin] !== "in")||(pinsInUse[this.pin] === "pwm")) {
+        node.warn(RED._("rpi-gpio.errors.alreadyset",{pin:this.pin,type:pinTypes[pinsInUse[this.pin]]}));
+      }
+      this.topic
+      var node = this;
+      var setupParams = {
+          mode: 'in'
+      }
+
+      if(this.brokerConn && node.pin !== undefined) {
+        node.brokerConn.register(node);
+        node.status({fill:"green",shape:"dot",text:"rpi-gpio.status.ok"});
+        this.topic = `tsa/gpio/${gpioMapping[node.pin].gpio}/value`
+        this.brokerConn.publish({
+          topic: `tsa/gpio/${gpioMapping[node.pin].gpio}/setup`,
+          qos: 0,
+          retain: false,
+          payload: JSON.stringify(setupParams)
+        })
+
+        this.brokerConn.subscribe(this.topic, 0, function(topic, payload, packet) {
+          if(isUtf8(payload)) {
+            payload = payload.toString();
+          }
+          payload = Number(payload)
+          if(node.buttonState !== -1 && !isNaN(payload) && node.buttonState !== payload){
+              node.send({ topic:`pi/${node.pin}`, payload:payload, intent:((payload===0)?0:1) });
+          }
+          node.buttonState = payload;
+          node.status({fill:"green",shape:"dot",text:payload});
+        })
+      } else if(node.pin == undefined) {
+        node.warn(RED._("rpi-gpio.errors.invalidpin")+": "+node.pin);
+      }
+
+      node.on("close", function(done) {
+        node.status({fill:"grey",shape:"ring",text:"rpi-gpio.status.closed"});
+        if(node.pin !== undefined){
+          delete pinsInUse[node.pin];
         }
 
-        if (node.pin !== undefined) {
-            this.client.on('connect', () => {
-                this.client.subscribe(`tsa/gpio/${gpioMapping[node.pin].gpio}/value`)
-                this.client.publish(`tsa/gpio/${gpioMapping[node.pin].gpio}/setup`, JSON.stringify({
-                    mode: 'in'
-                }))
-
-                node.status({fill:"green",shape:"dot",text:"rpi-gpio.status.ok"});
-            })
-
-            this.client.on('message', (topic, message) => {
-                message = Number(message.toString())
-                if(topic === `tsa/gpio/${gpioMapping[node.pin].gpio}/value`){
-                    if(node.buttonState !== -1 && !isNaN(message) && node.buttonState !== message){
-                        node.send({ topic:`pi/${node.pin}`, payload:message, intent:((message===0)?0:1) });
-                    }
-                    node.buttonState = message;
-                    node.status({fill:"green",shape:"dot",text:message});
-                    if (RED.settings.verbose) { node.log(`GPIO ${node.pin} out: ${message}`); }
-                }
-            })
+        if(node.brokerConn) {
+          if(node.topic){
+            node.brokerConn.unsubscribe(node.topic, node.id);
+          }
+          node.brokerConn.deregister(node, done);
+        } else {
+          done();
         }
-        else {
-            node.warn(RED._("rpi-gpio.errors.invalidpin")+": "+node.pin);
-        }
-
-        node.on("close", function(done) {
-            node.status({fill:"grey",shape:"ring",text:"rpi-gpio.status.closed"});
-            delete pinsInUse[node.pin];
-            if (this.client) {
-                this.client.unsubscribe(`tsa/gpio/${gpioMapping[node.pin].gpio}/value`)
-                this.client.end()
-            }
-            done();
-        });
+      });
     }
-    RED.nodes.registerType("rpi-gpio in",GPIOInNode);
+    RED.nodes.registerType("rpi-gpio in", GPIOInNode);
 
     function GPIOOutNode(n) {
-        RED.nodes.createNode(this,n);
-        this.pin = n.pin;
-        this.set = n.set || false;;
-        this.level = Number(n.level) || 0;
-        this.client = mqtt.connect(mqtt_option.get_url())
-        var node = this;
-        if (!pinsInUse.hasOwnProperty(this.pin)) {
-            pinsInUse[this.pin] = "out";
-        }
-        else {
-            if ((pinsInUse[this.pin] !== "out")||(pinsInUse[this.pin] === "pwm")) {
-                node.warn(RED._("rpi-gpio.errors.alreadyset",{pin:this.pin,type:pinTypes[pinsInUse[this.pin]]}));
+      RED.nodes.createNode(this,n);
+      this.pin = n.pin;
+      this.set = n.set || false;;
+      this.level = Number(n.level) || 0;
+      this.broker = n.broker;
+      this.brokerConn = RED.nodes.getNode(this.broker);
+      var node = this;
+      if(!pinsInUse.hasOwnProperty(this.pin)) {
+        pinsInUse[this.pin] = "out";
+      } else if ((pinsInUse[this.pin] !== "out")||(pinsInUse[this.pin] === "pwm")) {
+        node.warn(RED._("rpi-gpio.errors.alreadyset",{pin:this.pin,type:pinTypes[pinsInUse[this.pin]]}));
+      }
+
+      var setupParams = {
+        mode: 'out'
+      }
+      if(node.set){
+        setupParams.initial = node.level
+      }
+
+      if(this.brokerConn && node.pin !== undefined) {
+        node.brokerConn.register(node);
+        node.status({fill:"green",shape:"dot",text:"rpi-gpio.status.ok"});
+
+        this.brokerConn.publish({
+          topic: `tsa/gpio/${gpioMapping[node.pin].gpio}/setup`,
+          qos: 0,
+          retain: false,
+          payload: JSON.stringify(setupParams)
+        })
+
+        node.on("input", function(msg){
+            var out
+            if(msg.hasOwnProperty("intent") && (msg.intent == 0 || msg.intent == 1)){
+              out = Number(msg.intent)
+            } else {
+              if (msg.payload === "true") { msg.payload = true; }
+              if (msg.payload === "false") { msg.payload = false; }
+              try{
+                out = Math.round(Number(msg.payload));
+              } catch(e){}
             }
-        }
-
-        if (node.pin !== undefined) {
-            this.client.on('connect', () => {
-                var setupParams = {
-                    mode: 'out'
-                }
-                if(node.set){
-                  setupParams.initial = node.level
-                }
-                this.client.publish(`tsa/gpio/${gpioMapping[node.pin].gpio}/setup`, JSON.stringify(setupParams))
-
-                node.status({fill:"green",shape:"dot",text:"rpi-gpio.status.ok"});
-                node.on("input", function(msg){
-                    var out
-                    if(msg.hasOwnProperty("intent") && (msg.intent === 0 || msg.intent ===1)){
-                        out = Number(msg.intent)
-                    } else {
-                        if (msg.payload === "true") { msg.payload = true; }
-                        if (msg.payload === "false") { msg.payload = false; }
-                        try{
-                            out = Math.round(Number(msg.payload));
-                        } catch(e){}
-                    }
-                    var limit = 1;
-                    if ((out >= 0) && (out <= limit)) {
-                        this.client.publish(`tsa/gpio/${gpioMapping[node.pin].gpio}/value/set`, `${out}`)
-                        node.status({fill:"green",shape:"dot",text:`${out}`});
-                    }
-                    else { node.warn(RED._("rpi-gpio.errors.invalidinput")+": "+out); }
-                });
-            })
-        }
-        else {
-            node.warn(RED._("rpi-gpio.errors.invalidpin")+": "+node.pin);
-        }
-
-        node.on("close", function(done) {
-            node.status({fill:"grey",shape:"ring",text:"rpi-gpio.status.closed"});
-            delete pinsInUse[node.pin];
-            if (this.client) {
-                this.client.end()
+            var limit = 1;
+            if ((out >= 0) && (out <= limit)) {
+              this.brokerConn.publish({
+                topic: `tsa/gpio/${gpioMapping[node.pin].gpio}/value/set`,
+                qos: 0,
+                retain: false,
+                payload: `${out}`
+              })
+              node.status({fill:"green",shape:"dot",text:`${out}`});
             }
-            done();
-        });
+            else { node.warn(RED._("rpi-gpio.errors.invalidinput")+": "+out); }
+          });
+      } else if(node.pin == undefined) {
+        node.warn(RED._("rpi-gpio.errors.invalidpin")+": "+node.pin);
+      }
 
+      node.on("close", function(done){
+        node.status({fill:"grey",shape:"ring",text:"rpi-gpio.status.closed"});
+        if(node.pin !== undefined){
+          delete pinsInUse[node.pin];
+        }
+
+        if(node.brokerConn) {
+          node.brokerConn.deregister(node, done);
+        } else {
+          done();
+        }
+      });
     }
-    RED.nodes.registerType("rpi-gpio out",GPIOOutNode);
+    RED.nodes.registerType("rpi-gpio out", GPIOOutNode);
 
     var pitype = { type: "" };
     fs.readFile('/proc/cpuinfo', 'utf8', function(err, data){
