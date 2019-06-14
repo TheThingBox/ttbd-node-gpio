@@ -204,18 +204,25 @@ module.exports = function(RED) {
                         binaryRev += ("00000000" + (parseInt(str, 16)).toString(2)).substr(-8);
                     })
                     _pitype.rev = parseInt(binaryRev.substr(binaryRev.length-4,4), 2)
-                    switch (parseInt(binaryRev.substr(binaryRev.length-12,8), 2)) {
-                        case 0: _pitype.type = "Model A"; _pitype.p1_revision = 2; break;
-                        case 1: _pitype.type = "Model B"; _pitype.p1_revision = 2; break;
-                        case 2: _pitype.type = "Model A+"; _pitype.p1_revision = 3; break;
-                        case 3: _pitype.type = "Model B+"; _pitype.p1_revision = 3; break;
-                        case 4: _pitype.type = "Pi 2 Model B"; _pitype.p1_revision = 3; break;
-                        case 5: _pitype.type = "Alpha"; _pitype.p1_revision = 3; break;
-                        case 6: _pitype.type = "Compute"; _pitype.p1_revision = 0; break;
-                        case 8: _pitype.type = "Pi 3 Model B"; _pitype.p1_revision = 3; break;
-                        case 9: _pitype.type = "Zero"; _pitype.p1_revision = 3; break;
-                        default : _pitype.type = "Unknown"; _pitype.p1_revision = 3; break;
+                    switch (parseInt(binaryRev.substr(binaryRev.length-12,8), 2).toString(16)) {
+                        case '0': _pitype.type = "A"; _pitype.pi = 1; break;
+                        case '1': _pitype.type = "B"; _pitype.pi = 1; break;
+                        case '2': _pitype.type = "A+"; _pitype.pi = 1; break;
+                        case '3': _pitype.type = "B+"; _pitype.pi = 1; break;
+                        case '4': _pitype.type = "B"; _pitype.pi = 2; break;
+                        case '5': _pitype.type = "Alpha"; _pitype.pi = -1; break;
+                        case '6': _pitype.type = "CM"; _pitype.pi = 1; break;
+                        case '8': _pitype.type = "B"; _pitype.pi = 3; break;
+                        case '9': _pitype.type = "Zero"; _pitype.pi = 0; break;
+                        case 'a': _pitype.type = "CM"; _pitype.pi = 3; break;
+                        case 'c': _pitype.type = "Zero W"; _pitype.pi = 0; break;
+                        case 'd': _pitype.type = "B+"; _pitype.pi = 3; break;
+                        case 'e': _pitype.type = "A+"; _pitype.pi = 3; break;
+                        case 'f': _pitype.type = "Internal"; _pitype.pi = -1; break;
+                        case '10': _pitype.type = "CM+"; _pitype.pi = 3; break;
+                        default : _pitype.type = "Unknown"; _pitype.pi = 3; break;
                     }
+
                     switch (parseInt(binaryRev.substr(binaryRev.length-16,4), 2)) {
                         case 0: _pitype.processor = "BCM2835"; break;
                         case 1: _pitype.processor = "BCM2836"; break;
@@ -237,82 +244,83 @@ module.exports = function(RED) {
                     }
                 }
                 else if(revision.length === 4){
+                  _pitype.pi = 1;
                   if (revision === "0002" || revision === "0003"){
                      _pitype.type = "Model B";
-                     _pitype.p1_revision = 1;
+                     _pitype.rev = 1;
                      _pitype.ram = "256M";
                      _pitype.processor = "BCM2835";
                   } else if (revision === "0004") {
                      _pitype.type = "Model B";
-                     _pitype.p1_revision = 2;
+                     _pitype.rev = 2;
                      _pitype.ram = "256M";
                      _pitype.manufacturer = "Sony";
                      _pitype.processor = "BCM2835";
                   } else if (revision === "0005") {
                      _pitype.type = "Model B";
-                     _pitype.p1_revision = 2;
+                     _pitype.rev = 2;
                      _pitype.ram = "256M";
                      _pitype.manufacturer = "Qisda";
                      _pitype.processor = "BCM2835";
                   } else if (revision === "0006") {
                      _pitype.type = "Model B";
-                     _pitype.p1_revision = 2;
+                     _pitype.rev = 2;
                      _pitype.ram = "256M";
                      _pitype.manufacturer = "Egoman";
                      _pitype.processor = "BCM2835";
                   } else if (revision === "0007") {
                      _pitype.type = "Model A";
-                     _pitype.p1_revision = 2;
+                     _pitype.rev = 2;
                      _pitype.ram = "256M";
                      _pitype.manufacturer = "Egoman";
                      _pitype.processor = "BCM2835";
                   } else if (revision === "0008") {
                      _pitype.type = "Model A";
-                     _pitype.p1_revision = 2;
+                     _pitype.rev = 2;
                      _pitype.ram = "256M";
                      _pitype.manufacturer = "Sony";
                      _pitype.processor = "BCM2835";
                   } else if (revision === "0009") {
                      _pitype.type = "Model A";
-                     _pitype.p1_revision = 2;
+                     _pitype.rev = 2;
                      _pitype.ram = "256M";
                      _pitype.manufacturer = "Qisda";
                      _pitype.processor = "BCM2835";
                   } else if (revision === "000d") {
                      _pitype.type = "Model B";
-                     _pitype.p1_revision = 2;
+                     _pitype.rev = 2;
                      _pitype.ram = "512M";
                      _pitype.manufacturer = "Egoman";
                      _pitype.processor = "BCM2835";
                   } else if (revision === "000e") {
                      _pitype.type = "Model B";
-                     _pitype.p1_revision = 2;
+                     _pitype.rev = 2;
                      _pitype.ram = "512M";
                      _pitype.manufacturer = "Sony";
                      _pitype.processor = "BCM2835";
                   } else if (revision === "000f") {
                      _pitype.type = "Model B";
-                     _pitype.p1_revision = 2;
+                     _pitype.rev = 2;
                      _pitype.ram = "512M";
                      _pitype.manufacturer = "Qisda";
                      _pitype.processor = "BCM2835";
                   } else if (revision === "0011" || revision === "0014") {
                      _pitype.type = "Compute Module";
-                     _pitype.p1_revision = 0;
+                     _pitype.rev = 0;
                      _pitype.ram = "512M";
                      _pitype.processor = "BCM2835";
                   } else if (revision === "0012") {
                      _pitype.type = "Model A+";
-                     _pitype.p1_revision = 3;
+                     _pitype.rev = 3;
                      _pitype.ram = "256M";
                      _pitype.processor = "BCM2835";
                   } else if (revision === "0010" || revision === "0013") {
                      _pitype.type = "Model B+";
-                     _pitype.p1_revision = 3;
+                     _pitype.rev = 3;
                      _pitype.ram = "512M";
                      _pitype.processor = "BCM2835";
                   } else {  // don't know - assume revision 3 p1 connector
-                     _pitype.p1_revision = 3;
+                     _pitype.rev = 3;
                   }
                 }
                 pitype = _pitype
