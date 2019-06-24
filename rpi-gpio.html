@@ -21,10 +21,24 @@
         display: table-row-group;
         line-height: 12px;
     }
+    .rpi-gpio-pinTable .ledTableBody {
+        width: 340px;
+        display: table-caption;
+        line-height: 12px;
+        margin-bottom: 8px;
+    }
     .rpi-gpio-pinTable .pinTableRow {
         width: 340px;
         display: table-row;
         height: 14px;
+    }
+    .rpi-gpio-pinTable .ledTableCell {
+        width: 340px;
+        display: table-cell;
+        text-align: center;
+        vertical-align: top;
+        border: 1px solid #444;
+        border-bottom-style: none;
     }
     .rpi-gpio-pinTable .pinTableCellL {
         width: 170px;
@@ -33,6 +47,7 @@
         padding-right: 4px;
         vertical-align: top;
         border: 1px solid #444;
+        border-bottom-style: none;
     }
     .rpi-gpio-pinTable .pinTableCellR {
         width: 170px;
@@ -41,6 +56,11 @@
         padding-left: 4px;
         vertical-align: top;
         border: 1px solid #000;
+        border-bottom-style: none;
+        border-left-style: none;
+    }
+    .rpi-gpio-pinTable .lastrow {
+      border-bottom-style: solid;
     }
     .rpi-gpio-pinTable .pinColorPower {
         background-color:#FECBCE;
@@ -48,8 +68,14 @@
     .rpi-gpio-pinTable .pinColorGround {
         background-color:#DDDDDD;
     }
+    .rpi-gpio-pinTable .pinColorLed {
+        background-color:#8edb8e;
+    }
     .rpi-gpio-pinTable .pinColorGPIO {
         background-color:#BFEBBF;
+    }
+    .rpi-gpio-pinTable .pinColorGPIO2 {
+        background-color:#8edb8e;
     }
     .rpi-gpio-pinTable .pinColorDual {
         background-color:#D0E6F4;
@@ -67,68 +93,84 @@
       <div class="form-row" style="min-width: 540px">
           <label><i class="fa fa-circle"></i> <span data-i18n="rpi-gpio.pinname"></span></label>
           <input type="text" id="node-input-pin" style="display:none;">
-          <div class="rpi-gpio-pinTable" style="display: none;">
-              <div class="pinTableBody" id="pinform_cm" style="display: none;">
+          <input type="hidden" id="node-input-piModel">
+          <div class="rpi-gpio-pinTable" id="pinform_cm" style="display:none;">
+              <div class="ledTableBody">
                   <div class="pinTableRow">
-                      <div class="pinTableCellL pinColorGPIO"><label>TIC 1 <input id="pinTable-pin-3" type="radio" name="pins" value="3"></label></div>
-                      <div class="pinTableCellR pinColorPower"><label><input disabled type="radio" name="pins" value=""> 24VDC Power</label></div>
+                      <div class="ledTableCell pinColorLed"><label>Led 1 <input type="radio" name="pins" value="52"></label></div>
                   </div>
                   <div class="pinTableRow">
-                      <div class="pinTableCellL pinColorGPIO"><label>TIC 2 <input id="pinTable-pin-4" type="radio" name="pins" value="4"></label></div>
-                      <div class="pinTableCellR pinColorPower"><label><input disabled type="radio" name="pins" value=""> 24VDC Power</label></div>
+                      <div class="ledTableCell pinColorLed"><label>Led 2 <input type="radio" name="pins" value="54"></label></div>
                   </div>
                   <div class="pinTableRow">
-                      <div class="pinTableCellL pinColorGPIO"><label>ES 4/20mA A <input id="pinTable-pin-4" type="radio" name="pins" value="4"></label></div>
-                      <div class="pinTableCellR pinColorGround"><label><input disabled type="radio" name="pins" value=""> Ground</label></div>
-                  </div>
-                  <div class="pinTableRow">
-                      <div class="pinTableCellL pinColorGPIO"><label>ES 4/20mA B <input id="pinTable-pin-4" type="radio" name="pins" value="4"></label></div>
-                      <div class="pinTableCellR pinColorGround"><label><input disabled type="radio" name="pins" value=""> Ground</label></div>
-                  </div>
-                  <div class="pinTableRow">
-                      <div class="pinTableCellL pinColorGPIO"><label>RS485 + <input id="pinTable-pin-5" type="radio" name="pins" value="5"></label></div>
-                  </div>
-                  <div class="pinTableRow">
-                      <div class="pinTableCellL pinColorGPIO"><label>RS485 - <input id="pinTable-pin-6" type="radio" name="pins" value="6"></label></div>
-                  </div>
-                  <div class="pinTableRow">
-                      <div class="pinTableCellL pinColorGPIO"><label>ES TOR1 - <input id="pinTable-pin-7" type="radio" name="pins" value="7"></label></div>
-                  </div>
-                  <div class="pinTableRow">
-                      <div class="pinTableCellL pinColorGPIO"><label>ES TOR1 + <input id="pinTable-pin-8" type="radio" name="pins" value="8"></label></div>
-                  </div>
-                  <div class="pinTableRow">
-                      <div class="pinTableCellL pinColorGPIO"><label>ES TOR2 - <input id="pinTable-pin-9" type="radio" name="pins" value="9"></label></div>
-                  </div>
-                  <div class="pinTableRow">
-                      <div class="pinTableCellL pinColorGPIO"><label>ES TOR2 + <input id="pinTable-pin-10" type="radio" name="pins" value="10"></label></div>
-                  </div>
-                  <div class="pinTableRow">
-                      <div class="pinTableCellL pinColorGPIO"><label>ES TOR3 - <input id="pinTable-pin-11" type="radio" name="pins" value="11"></label></div>
-                  </div>
-                  <div class="pinTableRow">
-                      <div class="pinTableCellL pinColorGPIO"><label>ES TOR3 + <input id="pinTable-pin-12" type="radio" name="pins" value="12"></label></div>
-                  </div>
-                  <div class="pinTableRow">
-                      <div class="pinTableCellL pinColorGPIO"><label>Relais 1 NC <input id="pinTable-pin-13" type="radio" name="pins" value="13"></label></div>
-                  </div>
-                  <div class="pinTableRow">
-                      <div class="pinTableCellL pinColorGPIO"><label>Relais 1 COM <input id="pinTable-pin-14" type="radio" name="pins" value="14"></label></div>
-                  </div>
-                  <div class="pinTableRow">
-                      <div class="pinTableCellL pinColorGPIO"><label>Relais 1 NO <input id="pinTable-pin-15" type="radio" name="pins" value="15"></label></div>
-                  </div>
-                  <div class="pinTableRow">
-                      <div class="pinTableCellL pinColorGPIO"><label>Relais 2 NC <input id="pinTable-pin-16" type="radio" name="pins" value="16"></label></div>
-                  </div>
-                  <div class="pinTableRow">
-                      <div class="pinTableCellL pinColorGPIO"><label>Relais 2 COM <input id="pinTable-pin-17" type="radio" name="pins" value="17"></label></div>
-                  </div>
-                  <div class="pinTableRow">
-                      <div class="pinTableCellL pinColorGPIO"><label>Relais 2 NO <input id="pinTable-pin-18" type="radio" name="pins" value="18"></label></div>
+                      <div class="ledTableCell pinColorLed lastrow"><label>Led 3 <input type="radio" name="pins" value="58"></label></div>
                   </div>
               </div>
-              <div class="pinTableBody" id="pinform_b" style="display: none;">
+              <div class="pinTableBody">
+                  <div class="pinTableRow">
+                      <div class="pinTableCellL pinColorGPIO"><label>TIC 1 <input disabled type="radio" name="pins" value=""></label></div>
+                      <div class="pinTableCellR pinColorPower"><label><input disabled type="radio" name="pins" value=""> 24VDC Power</label></div>
+                  </div>
+                  <div class="pinTableRow">
+                      <div class="pinTableCellL pinColorGPIO"><label>TIC 2 <input disabled type="radio" name="pins" value=""></label></div>
+                      <div class="pinTableCellR pinColorPower"><label><input disabled type="radio" name="pins" value=""> 24VDC Power</label></div>
+                  </div>
+                  <div class="pinTableRow">
+                      <div class="pinTableCellL pinColorDual"><label>ES 4/20mA A <input disabled type="radio" name="pins" value=""></label></div>
+                      <div class="pinTableCellR pinColorGround"><label><input disabled type="radio" name="pins" value=""> Ground</label></div>
+                  </div>
+                  <div class="pinTableRow">
+                      <div class="pinTableCellL pinColorDual"><label>ES 4/20mA B <input disabled type="radio" name="pins" value=""></label></div>
+                      <div class="pinTableCellR pinColorGround"><label><input disabled type="radio" name="pins" value=""> Ground</label></div>
+                  </div>
+                  <div class="pinTableRow">
+                      <div class="pinTableCellL pinColorDual"><label>+ RS485 <input disabled type="radio" name="pins" value=""></label></div>
+                      <div class="pinTableCellR pinColorGround"><label></div>
+                  </div>
+                  <div class="pinTableRow">
+                      <div class="pinTableCellL pinColorDual"><label>- RS485 <input disabled type="radio" name="pins" value=""></label></div>
+                      <div class="pinTableCellR pinColorGround lastrow"><label></div>
+                  </div>
+                  <div class="pinTableRow">
+                      <div class="pinTableCellL pinColorGPIO"><label>- ES TOR1 <input disabled type="radio" name="pins" value=""></label></div>
+                  </div>
+                  <div class="pinTableRow">
+                      <div class="pinTableCellL pinColorGPIO"><label>+ ES TOR1 <input id="pinTable-pin-36" type="radio" name="pins" value="36"></label></div>
+                  </div>
+                  <div class="pinTableRow">
+                      <div class="pinTableCellL pinColorGPIO2"><label>- ES TOR2 <input disabled type="radio" name="pins" value=""></label></div>
+                  </div>
+                  <div class="pinTableRow">
+                      <div class="pinTableCellL pinColorGPIO2"><label>+ ES TOR2 <input id="pinTable-pin-46" type="radio" name="pins" value="46"></label></div>
+                  </div>
+                  <div class="pinTableRow">
+                      <div class="pinTableCellL pinColorGPIO"><label>- ES TOR3 <input disabled type="radio" name="pins" value=""></label></div>
+                  </div>
+                  <div class="pinTableRow">
+                      <div class="pinTableCellL pinColorGPIO"><label>+ ES TOR3 <input id="pinTable-pin-48" type="radio" name="pins" value="48"></label></div>
+                  </div>
+                  <div class="pinTableRow">
+                      <div class="pinTableCellL pinColorGPIO2"><label>NC - Relais 1 <input disabled type="radio" name="pins" value=""></label></div>
+                  </div>
+                  <div class="pinTableRow">
+                      <div class="pinTableCellL pinColorGPIO2"><label>COM - Relais 1 <input id="pinTable-pin-21" type="radio" name="pins" value="21"></label></div>
+                  </div>
+                  <div class="pinTableRow">
+                      <div class="pinTableCellL pinColorGPIO2"><label>NO - Relais 1 <input disabled type="radio" name="pins" value=""></label></div>
+                  </div>
+                  <div class="pinTableRow">
+                      <div class="pinTableCellL pinColorGPIO"><label>NC - Relais 2 <input disabled type="radio" name="pins" value=""></label></div>
+                  </div>
+                  <div class="pinTableRow">
+                      <div class="pinTableCellL pinColorGPIO"><label>COM - Relais 2 <input id="pinTable-pin-45" type="radio" name="pins" value="45"></label></div>
+                  </div>
+                  <div class="pinTableRow">
+                      <div class="pinTableCellL pinColorGPIO lastrow"><label>NO - Relais 2 <input disabled type="radio" name="pins" value=""></label></div>
+                  </div>
+              </div>
+          </div>
+          <div class="rpi-gpio-pinTable" id="pinform_b" style="display:none;">
+              <div class="pinTableBody">
                   <div class="pinTableRow">
                       <div class="pinTableCellL pinColorPower"><label>3.3V Power - 1 <input disabled type="radio" name="pins" value=""></label></div>
                       <div class="pinTableCellR pinColorPower"><label><input disabled type="radio" name="pins" value=""> 2 - 5V Power</label></div>
@@ -206,8 +248,8 @@
                       <div class="pinTableCellR pinColorGPIO"><label for="pinTable-pin-38"><input id="pinTable-pin-38" type="radio" name="pins" value="38"> 38 - GPIO20</label></div>
                   </div>
                   <div class="pinTableRow">
-                      <div class="pinTableCellL pinColorGround"><label>Ground - 39 <input disabled type="radio" name="pins" value=""></label></div>
-                      <div class="pinTableCellR pinColorGPIO"><label for="pinTable-pin-40"><input id="pinTable-pin-40" type="radio" name="pins" value="40"> 40 - GPIO21</label></div>
+                      <div class="pinTableCellL pinColorGround lastrow"><label>Ground - 39 <input disabled type="radio" name="pins" value=""></label></div>
+                      <div class="pinTableCellR pinColorGPIO lastrow"><label for="pinTable-pin-40"><input id="pinTable-pin-40" type="radio" name="pins" value="40"> 40 - GPIO21</label></div>
                   </div>
               </div>
           </div>
@@ -246,7 +288,8 @@
 </script>
 
 <script type="text/javascript">
-    var bcm2pin = {
+    var bcm2pin = {}
+    bcm2pin.b = {
         "2":"3", "3":"5", "4":"7", "14":"8", "15":"10", "17":"11", "18":"12", "27":"13", "22":"15",
         "23":"16", "24":"18", "10":"19", "9":"21", "25":"22", "11":"23", "8":"24", "7":"26",
         "5":"29", "6":"31", "12":"32", "13":"33", "19":"35", "16":"36", "26":"37", "20":"38", "21":"40"
@@ -259,7 +302,8 @@
             name: { value:"" },
             pin: { value:"tri",required:true,validate:RED.validators.number() },
             read: { value:false },
-            broker: {value: "MQTT.Localhost", type: "mqtt-broker", required: true}
+            broker: {value: "MQTT.Localhost", type: "mqtt-broker", required: true},
+            piModel: { value:"" },
         },
         inputs:0,
         outputs:1,
@@ -282,33 +326,6 @@
         outputLabels: function() { return "GPIO"+this.pin; },
         oneditprepare: function() {
             var that = this
-            var modelToType = [
-              {
-                name: 'zero',
-                types: ['Zero', 'Zero+'],
-                supported: false
-              },
-              {
-                name: 'a',
-                types: ['A', 'A+'],
-                supported: false
-              },
-              {
-                name: 'b',
-                types: ['B', 'B+', 'Unknown'],
-                supported: true
-              },
-              {
-                name: 'cm',
-                types: ['CM', 'CM+'],
-                supported: true
-              },
-              {
-                name: 'unknown',
-                types: ['Alpha', 'Internal'],
-                supported: false
-              },
-            ]
             var _piModel = null
             var getPiModel = function(){
               return new Promise( (resolve, reject) => {
@@ -324,9 +341,10 @@
                   }
                 })
                 .then(hardware => {
-                  var index = modelToType.findIndex(item => item.types.indexOf(hardware.type) !== -1)
-                  if(index !== -1 && modelToType[index].supported){
-                    _piModel = modelToType[index].name
+                  if(hardware.gpio_type){
+                    _piModel = hardware.gpio_type
+                    that.piModel = hardware.gpio_type
+                    $("#node-input-piModel").val(that.piModel);
                   } else {
                     _piModel = null
                   }
@@ -345,7 +363,7 @@
             }
             getPiModel()
             .then(piModel => {
-              $('.rpi-gpio-pinTable').show()
+              $('.rpi-gpio-pinTable').hide()
               $(`#pinform_${piModel}`).show()
             })
             .catch(_ => {
@@ -393,12 +411,12 @@
                 .catch()
             });
             $('#pinform_b input').on('change', function() {
-                this.pin = $("#pinform_b input[type='radio']:checked").val();
-                $("#node-input-pin").val(this.pin);
+                that.pin = $("#pinform_b input[type='radio']:checked").val();
+                $("#node-input-pin").val(that.pin);
             });
             $('#pinform_cm input').on('change', function() {
-                this.pin = $("#pinform_cm input[type='radio']:checked").val();
-                $("#node-input-pin").val(this.pin);
+                that.pin = $("#pinform_cm input[type='radio']:checked").val();
+                $("#node-input-pin").val(that.pin);
             });
         }
     });
@@ -413,68 +431,84 @@
       <div class="form-row" style="min-width: 540px">
           <label><i class="fa fa-circle"></i> <span data-i18n="rpi-gpio.pinname"></span></label>
           <input type="text" id="node-input-pin" style="display:none;">
-          <div class="rpi-gpio-pinTable" style="display:none;">
-              <div class="pinTableBody" id="pinform_cm" style="display: none;">
+          <input type="hidden" id="node-input-piModel">
+          <div class="rpi-gpio-pinTable" id="pinform_cm" style="display:none;">
+              <div class="ledTableBody">
                   <div class="pinTableRow">
-                      <div class="pinTableCellL pinColorGPIO"><label>TIC 1 <input id="pinTable-pin-3" type="radio" name="pins" value="3"></label></div>
-                      <div class="pinTableCellR pinColorPower"><label><input disabled type="radio" name="pins" value=""> 24VDC Power</label></div>
+                      <div class="ledTableCell pinColorLed"><label>Led 1 <input type="radio" name="pins" value="52"></label></div>
                   </div>
                   <div class="pinTableRow">
-                      <div class="pinTableCellL pinColorGPIO"><label>TIC 2 <input id="pinTable-pin-4" type="radio" name="pins" value="4"></label></div>
-                      <div class="pinTableCellR pinColorPower"><label><input disabled type="radio" name="pins" value=""> 24VDC Power</label></div>
+                      <div class="ledTableCell pinColorLed"><label>Led 2 <input type="radio" name="pins" value="54"></label></div>
                   </div>
                   <div class="pinTableRow">
-                      <div class="pinTableCellL pinColorGPIO"><label>ES 4/20mA A <input id="pinTable-pin-4" type="radio" name="pins" value="4"></label></div>
-                      <div class="pinTableCellR pinColorGround"><label><input disabled type="radio" name="pins" value=""> Ground</label></div>
-                  </div>
-                  <div class="pinTableRow">
-                      <div class="pinTableCellL pinColorGPIO"><label>ES 4/20mA B <input id="pinTable-pin-4" type="radio" name="pins" value="4"></label></div>
-                      <div class="pinTableCellR pinColorGround"><label><input disabled type="radio" name="pins" value=""> Ground</label></div>
-                  </div>
-                  <div class="pinTableRow">
-                      <div class="pinTableCellL pinColorGPIO"><label>RS485 + <input id="pinTable-pin-5" type="radio" name="pins" value="5"></label></div>
-                  </div>
-                  <div class="pinTableRow">
-                      <div class="pinTableCellL pinColorGPIO"><label>RS485 - <input id="pinTable-pin-6" type="radio" name="pins" value="6"></label></div>
-                  </div>
-                  <div class="pinTableRow">
-                      <div class="pinTableCellL pinColorGPIO"><label>ES TOR1 - <input id="pinTable-pin-7" type="radio" name="pins" value="7"></label></div>
-                  </div>
-                  <div class="pinTableRow">
-                      <div class="pinTableCellL pinColorGPIO"><label>ES TOR1 + <input id="pinTable-pin-8" type="radio" name="pins" value="8"></label></div>
-                  </div>
-                  <div class="pinTableRow">
-                      <div class="pinTableCellL pinColorGPIO"><label>ES TOR2 - <input id="pinTable-pin-9" type="radio" name="pins" value="9"></label></div>
-                  </div>
-                  <div class="pinTableRow">
-                      <div class="pinTableCellL pinColorGPIO"><label>ES TOR2 + <input id="pinTable-pin-10" type="radio" name="pins" value="10"></label></div>
-                  </div>
-                  <div class="pinTableRow">
-                      <div class="pinTableCellL pinColorGPIO"><label>ES TOR3 - <input id="pinTable-pin-11" type="radio" name="pins" value="11"></label></div>
-                  </div>
-                  <div class="pinTableRow">
-                      <div class="pinTableCellL pinColorGPIO"><label>ES TOR3 + <input id="pinTable-pin-12" type="radio" name="pins" value="12"></label></div>
-                  </div>
-                  <div class="pinTableRow">
-                      <div class="pinTableCellL pinColorGPIO"><label>Relais 1 NC <input id="pinTable-pin-13" type="radio" name="pins" value="13"></label></div>
-                  </div>
-                  <div class="pinTableRow">
-                      <div class="pinTableCellL pinColorGPIO"><label>Relais 1 COM <input id="pinTable-pin-14" type="radio" name="pins" value="14"></label></div>
-                  </div>
-                  <div class="pinTableRow">
-                      <div class="pinTableCellL pinColorGPIO"><label>Relais 1 NO <input id="pinTable-pin-15" type="radio" name="pins" value="15"></label></div>
-                  </div>
-                  <div class="pinTableRow">
-                      <div class="pinTableCellL pinColorGPIO"><label>Relais 2 NC <input id="pinTable-pin-16" type="radio" name="pins" value="16"></label></div>
-                  </div>
-                  <div class="pinTableRow">
-                      <div class="pinTableCellL pinColorGPIO"><label>Relais 2 COM <input id="pinTable-pin-17" type="radio" name="pins" value="17"></label></div>
-                  </div>
-                  <div class="pinTableRow">
-                      <div class="pinTableCellL pinColorGPIO"><label>Relais 2 NO <input id="pinTable-pin-18" type="radio" name="pins" value="18"></label></div>
+                      <div class="ledTableCell pinColorLed lastrow"><label>Led 3 <input type="radio" name="pins" value="58"></label></div>
                   </div>
               </div>
-              <div class="pinTableBody" id="pinform_b" sytle="display:none;">
+              <div class="pinTableBody">
+                  <div class="pinTableRow">
+                      <div class="pinTableCellL pinColorGPIO"><label>TIC 1 <input disabled type="radio" name="pins" value=""></label></div>
+                      <div class="pinTableCellR pinColorPower"><label><input disabled type="radio" name="pins" value=""> 24VDC Power</label></div>
+                  </div>
+                  <div class="pinTableRow">
+                      <div class="pinTableCellL pinColorGPIO"><label>TIC 2 <input disabled type="radio" name="pins" value=""></label></div>
+                      <div class="pinTableCellR pinColorPower"><label><input disabled type="radio" name="pins" value=""> 24VDC Power</label></div>
+                  </div>
+                  <div class="pinTableRow">
+                      <div class="pinTableCellL pinColorDual"><label>ES 4/20mA A <input disabled type="radio" name="pins" value=""></label></div>
+                      <div class="pinTableCellR pinColorGround"><label><input disabled type="radio" name="pins" value=""> Ground</label></div>
+                  </div>
+                  <div class="pinTableRow">
+                      <div class="pinTableCellL pinColorDual"><label>ES 4/20mA B <input disabled type="radio" name="pins" value=""></label></div>
+                      <div class="pinTableCellR pinColorGround"><label><input disabled type="radio" name="pins" value=""> Ground</label></div>
+                  </div>
+                  <div class="pinTableRow">
+                      <div class="pinTableCellL pinColorDual"><label>+ RS485 <input disabled type="radio" name="pins" value=""></label></div>
+                      <div class="pinTableCellR pinColorGround"><label></div>
+                  </div>
+                  <div class="pinTableRow">
+                      <div class="pinTableCellL pinColorDual"><label>- RS485 <input disabled type="radio" name="pins" value=""></label></div>
+                      <div class="pinTableCellR pinColorGround lastrow"><label></div>
+                  </div>
+                  <div class="pinTableRow">
+                      <div class="pinTableCellL pinColorGPIO"><label>- ES TOR1 <input id="pinTable-pin-28" type="radio" name="pins" value="28"></label></div>
+                  </div>
+                  <div class="pinTableRow">
+                      <div class="pinTableCellL pinColorGPIO"><label>+ ES TOR1 <input disabled type="radio" name="pins" value=""></label></div>
+                  </div>
+                  <div class="pinTableRow">
+                      <div class="pinTableCellL pinColorGPIO2"><label>- ES TOR2 <input id="pinTable-pin-30" type="radio" name="pins" value="30"></label></div>
+                  </div>
+                  <div class="pinTableRow">
+                      <div class="pinTableCellL pinColorGPIO2"><label>+ ES TOR2 <input disabled type="radio" name="pins" value=""></label></div>
+                  </div>
+                  <div class="pinTableRow">
+                      <div class="pinTableCellL pinColorGPIO"><label>- ES TOR3 <input id="pinTable-pin-34" type="radio" name="pins" value="34"></label></div>
+                  </div>
+                  <div class="pinTableRow">
+                      <div class="pinTableCellL pinColorGPIO"><label>+ ES TOR3 <input disabled type="radio" name="pins" value=""></label></div>
+                  </div>
+                  <div class="pinTableRow">
+                      <div class="pinTableCellL pinColorGPIO2"><label>NC - Relais 1 <input disabled type="radio" name="pins" value=""></label></div>
+                  </div>
+                  <div class="pinTableRow">
+                      <div class="pinTableCellL pinColorGPIO2"><label>COM - Relais 1 <input id="pinTable-pin-21" type="radio" name="pins" value="21"></label></div>
+                  </div>
+                  <div class="pinTableRow">
+                      <div class="pinTableCellL pinColorGPIO2"><label>NO - Relais 1 <input disabled type="radio" name="pins" value=""></label></div>
+                  </div>
+                  <div class="pinTableRow">
+                      <div class="pinTableCellL pinColorGPIO"><label>NC - Relais 2 <input disabled type="radio" name="pins" value=""></label></div>
+                  </div>
+                  <div class="pinTableRow">
+                      <div class="pinTableCellL pinColorGPIO"><label>COM - Relais 2 <input id="pinTable-pin-45" type="radio" name="pins" value="45"></label></div>
+                  </div>
+                  <div class="pinTableRow">
+                      <div class="pinTableCellL pinColorGPIO lastrow"><label>NO - Relais 2 <input disabled type="radio" name="pins" value=""></label></div>
+                  </div>
+              </div>
+          </div>
+          <div class="rpi-gpio-pinTable" id="pinform_b" style="display:none;">
+              <div class="pinTableBody">
                   <div class="pinTableRow">
                       <div class="pinTableCellL pinColorPower"><label>3.3V Power - 1 <input disabled type="radio" name="pins" value=""></label></div>
                       <div class="pinTableCellR pinColorPower"><label><input disabled type="radio" name="pins" value=""> 2 - 5V Power</label></div>
@@ -552,8 +586,8 @@
                       <div class="pinTableCellR pinColorGPIO"><label for="pinTable-pin-38"><input id="pinTable-pin-38" type="radio" name="pins" value="38"> 38 - GPIO20</label></div>
                   </div>
                   <div class="pinTableRow">
-                      <div class="pinTableCellL pinColorGround"><label>Ground - 39 <input disabled type="radio" name="pins" value=""></label></div>
-                      <div class="pinTableCellR pinColorGPIO"><label for="pinTable-pin-40"><input id="pinTable-pin-40" type="radio" name="pins" value="40"> 40 - GPIO21</label></div>
+                      <div class="pinTableCellL pinColorGround lastrow"><label>Ground - 39 <input disabled type="radio" name="pins" value=""></label></div>
+                      <div class="pinTableCellR pinColorGPIO lastrow"><label for="pinTable-pin-40"><input id="pinTable-pin-40" type="radio" name="pins" value="40"> 40 - GPIO21</label></div>
                   </div>
               </div>
           </div>
@@ -599,7 +633,8 @@
 </script>
 
 <script type="text/javascript">
-    var bcm2pin = {
+    var bcm2pin = {}
+    bcm2pin.b = {
         "2":"3", "3":"5", "4":"7", "14":"8", "15":"10", "17":"11", "18":"12", "27":"13", "22":"15",
         "23":"16", "24":"18", "10":"19", "9":"21", "25":"22", "11":"23", "8":"24", "7":"26",
         "5":"29", "6":"31", "12":"32", "13":"33", "19":"35", "16":"36", "26":"37", "20":"38", "21":"40"
@@ -613,7 +648,8 @@
             pin: { value:"",required:true,validate:RED.validators.number() },
             set: { value:"" },
             level: { value:"0" },
-            broker: {value: "MQTT.Localhost", type: "mqtt-broker", required: true}
+            broker: {value: "MQTT.Localhost", type: "mqtt-broker", required: true},
+            piModel: { value:"" },
         },
         inputs:1,
         outputs:0,
@@ -636,33 +672,6 @@
         inputLabels: function() { return "GPIO"+this.pin; },
         oneditprepare: function() {
             var that = this
-            var modelToType = [
-              {
-                name: 'zero',
-                types: ['Zero', 'Zero+'],
-                supported: false
-              },
-              {
-                name: 'a',
-                types: ['A', 'A+'],
-                supported: false
-              },
-              {
-                name: 'b',
-                types: ['B', 'B+', 'Unknown'],
-                supported: true
-              },
-              {
-                name: 'cm',
-                types: ['CM', 'CM+'],
-                supported: true
-              },
-              {
-                name: 'unknown',
-                types: ['Alpha', 'Internal'],
-                supported: false
-              },
-            ]
             var _piModel = null
             var getPiModel = function(){
               return new Promise( (resolve, reject) => {
@@ -678,9 +687,10 @@
                   }
                 })
                 .then(hardware => {
-                  var index = modelToType.findIndex(item => item.types.indexOf(hardware.type) !== -1)
-                  if(index !== -1 && modelToType[index].supported){
-                    _piModel = modelToType[index].name
+                  if(hardware.gpio_type){
+                    _piModel = hardware.gpio_type
+                    that.piModel = hardware.gpio_type
+                    $("#node-input-piModel").val(that.piModel);
                   } else {
                     _piModel = null
                   }
@@ -699,7 +709,7 @@
             }
             getPiModel()
             .then(piModel => {
-              $('.rpi-gpio-pinTable').show()
+              $('.rpi-gpio-pinTable').hide()
               $(`#pinform_${piModel}`).show()
             })
             .catch(_ => {
@@ -757,12 +767,12 @@
             $("#node-input-set").change(function () { setstate(); });
             setstate();
             $('#pinform_b input').on('change', function() {
-                this.pin = $("#pinform_b input[type='radio']:checked").val();
-                $("#node-input-pin").val(this.pin);
+                that.pin = $("#pinform_b input[type='radio']:checked").val();
+                $("#node-input-pin").val(that.pin);
             });
             $('#pinform_cm input').on('change', function() {
-                this.pin = $("#pinform_cm input[type='radio']:checked").val();
-                $("#node-input-pin").val(this.pin);
+                that.pin = $("#pinform_cm input[type='radio']:checked").val();
+                $("#node-input-pin").val(that.pin);
             });
         }
     });
