@@ -319,6 +319,7 @@ module.exports = function(RED) {
                               case 'e': _pitype.type = "A+"; _pitype.pi = 3; break;
                               case 'f': _pitype.type = "Internal"; _pitype.pi = -1; break;
                               case '10': _pitype.type = "CM+"; _pitype.pi = 3; break;
+                              case '11': _pitype.type = "B"; _pitype.pi = 4; break;
                               default : _pitype.type = "Unknown"; _pitype.pi = 3; break;
                           }
 
@@ -326,19 +327,24 @@ module.exports = function(RED) {
                               case 0: _pitype.processor = "BCM2835"; break;
                               case 1: _pitype.processor = "BCM2836"; break;
                               case 2: _pitype.processor = "BCM2837"; break;
+                              case 3: _pitype.processor = "BCM2711"; break;
                               default : _pitype.processor = "Unknown"; break;
                           }
                           switch (parseInt(binaryRev.substr(binaryRev.length-20,4), 2)) {
-                              case 0: _pitype.manufacturer = "Sony"; break;
+                              case 0: _pitype.manufacturer = "Sony US"; break;
                               case 1: _pitype.manufacturer = "Egoman"; break;
                               case 2: _pitype.manufacturer = "Embest"; break;
+                              case 3: _pitype.manufacturer = "Sony Japan"; break;
                               case 4: _pitype.manufacturer = "Embest"; break;
+                              case 5: _pitype.manufacturer = "Stadium"; break;
                               default : _pitype.manufacturer = "Unknown"; break;
                           }
                           switch (parseInt(binaryRev.substr(binaryRev.length-23,3), 2)) {
                               case 0: _pitype.ram = "256M"; break;
                               case 1: _pitype.ram = "512M"; break;
                               case 2: _pitype.ram = "1024M"; break;
+                              case 3: _pitype.ram = "2048M"; break;
+                              case 4: _pitype.ram = "4096M"; break;
                               default: _pitype.ram = "Unknown"; break;
                           }
                       }
