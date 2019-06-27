@@ -32,6 +32,7 @@
         display: table-row;
         height: 14px;
     }
+
     .rpi-gpio-pinTable .ledTableCell {
         width: 340px;
         display: table-cell;
@@ -39,6 +40,7 @@
         vertical-align: top;
         border: 1px solid #444;
         border-bottom-style: none;
+        border-left-style: none;
     }
     .rpi-gpio-pinTable .pinTableCellL {
         width: 170px;
@@ -61,6 +63,9 @@
     }
     .rpi-gpio-pinTable .lastrow {
       border-bottom-style: solid;
+    }
+    .rpi-gpio-pinTable .ledTableCell.firstcol {
+        border-left-style: solid;
     }
     .rpi-gpio-pinTable .pinColorPower {
         background-color:#FECBCE;
@@ -97,12 +102,8 @@
           <div class="rpi-gpio-pinTable" id="pinform_cm" style="display:none;">
               <div class="ledTableBody">
                   <div class="pinTableRow">
-                      <div class="ledTableCell pinColorLed"><label>Led 1 <input type="radio" name="pins" value="52"></label></div>
-                  </div>
-                  <div class="pinTableRow">
-                      <div class="ledTableCell pinColorLed"><label>Led 2 <input type="radio" name="pins" value="54"></label></div>
-                  </div>
-                  <div class="pinTableRow">
+                      <div class="ledTableCell pinColorLed lastrow firstcol"><label>Led 1 <input type="radio" name="pins" value="52"></label></div>
+                      <div class="ledTableCell pinColorLed lastrow"><label>Led 2 <input type="radio" name="pins" value="54"></label></div>
                       <div class="ledTableCell pinColorLed lastrow"><label>Led 3 <input type="radio" name="pins" value="58"></label></div>
                   </div>
               </div>
@@ -411,13 +412,23 @@
                 .catch()
             });
             $('#pinform_b input').on('change', function() {
-                that.pin = $("#pinform_b input[type='radio']:checked").val();
-                $("#node-input-pin").val(that.pin);
+                let pinnew = $("#pinform_b input[type='radio']:checked").val();
+                $("#node-input-pin").val(pinnew);
             });
             $('#pinform_cm input').on('change', function() {
-                that.pin = $("#pinform_cm input[type='radio']:checked").val();
-                $("#node-input-pin").val(that.pin);
+                let pinnew = $("#pinform_cm input[type='radio']:checked").val();
+                $("#node-input-pin").val(pinnew);
             });
+        },
+        oneditsave: function(){
+          let pinnow = this.pin;
+          let pinnew = $("#node-input-pin").val();
+          if(pinnew && pinew != pinnow){
+            this.pin = pinnew
+            this.dirty = true
+            this.changed = true
+            RED.nodes.dirty(true)
+          }
         }
     });
 </script>
@@ -435,12 +446,8 @@
           <div class="rpi-gpio-pinTable" id="pinform_cm" style="display:none;">
               <div class="ledTableBody">
                   <div class="pinTableRow">
-                      <div class="ledTableCell pinColorLed"><label>Led 1 <input type="radio" name="pins" value="52"></label></div>
-                  </div>
-                  <div class="pinTableRow">
-                      <div class="ledTableCell pinColorLed"><label>Led 2 <input type="radio" name="pins" value="54"></label></div>
-                  </div>
-                  <div class="pinTableRow">
+                      <div class="ledTableCell pinColorLed lastrow firstcol"><label>Led 1 <input type="radio" name="pins" value="52"></label></div>
+                      <div class="ledTableCell pinColorLed lastrow"><label>Led 2 <input type="radio" name="pins" value="54"></label></div>
                       <div class="ledTableCell pinColorLed lastrow"><label>Led 3 <input type="radio" name="pins" value="58"></label></div>
                   </div>
               </div>
@@ -767,13 +774,23 @@
             $("#node-input-set").change(function () { setstate(); });
             setstate();
             $('#pinform_b input').on('change', function() {
-                that.pin = $("#pinform_b input[type='radio']:checked").val();
-                $("#node-input-pin").val(that.pin);
+                let pinnew = $("#pinform_b input[type='radio']:checked").val();
+                $("#node-input-pin").val(pinnew);
             });
             $('#pinform_cm input').on('change', function() {
-                that.pin = $("#pinform_cm input[type='radio']:checked").val();
-                $("#node-input-pin").val(that.pin);
+                let pinnew = $("#pinform_cm input[type='radio']:checked").val();
+                $("#node-input-pin").val(pinnew);
             });
+        },
+        oneditsave: function(){
+          let pinnow = this.pin;
+          let pinnew = $("#node-input-pin").val();
+          if(pinnew && pinew != pinnow){
+            this.pin = pinnew
+            this.dirty = true
+            this.changed = true
+            RED.nodes.dirty(true)
+          }
         }
     });
 </script>

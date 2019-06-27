@@ -6,72 +6,34 @@ module.exports = function(RED) {
 
     var gpioMapping = {}
 
-    gpioMapping.b = [
-      { pin: 0,  gpio: null},
-      { pin: 1,  gpio: null},
-      { pin: 2,  gpio: null},
-      { pin: 3,  gpio: 2},
-      { pin: 4,  gpio: null},
-      { pin: 5,  gpio: 3},
-      { pin: 6,  gpio: null},
-      { pin: 7,  gpio: 4},
-      { pin: 8,  gpio: 14},
-      { pin: 9,  gpio: null},
-      { pin: 10, gpio: 15},
-      { pin: 11, gpio: 17},
-      { pin: 12, gpio: 18},
-      { pin: 13, gpio: 27},
-      { pin: 14, gpio: null},
-      { pin: 15, gpio: 22},
-      { pin: 16, gpio: 23},
-      { pin: 17, gpio: null},
-      { pin: 18, gpio: 24},
-      { pin: 19, gpio: 10},
-      { pin: 20, gpio: null},
-      { pin: 21, gpio: 9},
-      { pin: 22, gpio: 25},
-      { pin: 23, gpio: 11},
-      { pin: 24, gpio: 8},
-      { pin: 25, gpio: null},
-      { pin: 26, gpio: 7},
-      { pin: 27, gpio: null},
-      { pin: 28, gpio: null},
-      { pin: 29, gpio: 5},
-      { pin: 30, gpio: null},
-      { pin: 31, gpio: 6},
-      { pin: 32, gpio: 12},
-      { pin: 33, gpio: 13},
-      { pin: 34, gpio: null},
-      { pin: 35, gpio: 19},
-      { pin: 36, gpio: 16},
-      { pin: 37, gpio: 26},
-      { pin: 38, gpio: 20},
-      { pin: 39, gpio: null},
-      { pin: 40, gpio: 21}
-    ]
+    gpioMapping.b = {
+       "0": null,    "1": null,    "2": null,    "3": "2",     "4": null,
+       "5": "3",     "6": null,    "7": "4",     "8": "14",    "9": null,
+      "10": "15",   "11": "17",   "12": "18",   "13": "27",   "14": null,
+      "15": "22",   "16": "23",   "17": null,   "18": "24",   "19": "10",
+      "20": null,   "21": "9",    "22": "25",   "23": "11",   "24": "8",
+      "25": null,   "26": "7",    "27": null,   "28": null,   "29": "5",
+      "30": null,   "31": "6",    "32": "12",   "33": "13",   "34": null,
+      "35": "19",   "36": "16",   "37": "26",   "38": "20",   "39": null,
+      "40": "21"
+    }
 
-    gpioMapping.cm = [
-        { pin: 17,  gpio: null},
-        { pin: 63,  gpio: null},
-        { pin: 65,  gpio: null},
-        { pin: 51,  gpio: null},
-        { pin: 53,  gpio: null},
-        { pin: 28,  gpio: 28},
-        { pin: 36,  gpio: 31},
-        { pin: 30,  gpio: 29},
-        { pin: 46,  gpio: 32},
-        { pin: 34, gpio: 30},
-        { pin: 48, gpio: 33},
-        { pin: 21, gpio: 6},
-        { pin: 13, gpio: null},
-        { pin: 21, gpio: 6},
-        { pin: 45, gpio: 12},
-        { pin: 0, gpio: null},
-        { pin: 1, gpio: null},
-        { pin: 52, gpio: 34},
-        { pin: 54, gpio: 35},
-        { pin: 58, gpio: 36}
-    ]
+    gpioMapping.cm = {
+       "0": null,    "1": null,    "2": null,    "3": null,    "4": null,
+       "5": null,    "6": null,    "7": null,    "8": null,    "9": null,
+      "10": null,   "11": null,   "12": null,   "13": null,   "14": null,
+      "15": null,   "16": null,   "17": null,   "18": null,   "19": null,
+      "20": null,   "21": "6",    "22": null,   "23": null,   "24": null,
+      "25": null,   "26": null,   "27": null,   "28": "28",   "29": "5",
+      "30": "29",   "31": null,   "32": null,   "33": null,   "34": "30",
+      "35": null,   "36": "31",   "37": null,   "38": null,   "39": null,
+      "40": null,   "41": null,   "42": null,   "43": null,   "44": null,
+      "45": "12",   "46": "32",   "47": null,   "48": "33",   "49": null,
+      "50": null,   "51": null,   "52": "34",   "53": null,   "54": "35",
+      "55": null,   "56": null,   "57": null,   "58": "36",   "59": null,
+      "60": null,   "61": null,   "62": null,   "63": null,   "64": null,
+      "65": null,   "66": null,   "67": null,   "68": null,   "69": null
+    }
 
     var pinsInUse = {};
     var pinTypes = {"out":RED._("rpi-gpio.types.digout"), "tri":RED._("rpi-gpio.types.input"), "up":RED._("rpi-gpio.types.pullup"), "down":RED._("rpi-gpio.types.pulldown"), "pwm":RED._("rpi-gpio.types.pwmout")};
@@ -97,8 +59,6 @@ module.exports = function(RED) {
           mode: 'in'
       }
 
-      node.warn(node.piModel)
-
       if(this.brokerConn && node.pin !== undefined) {
         node.brokerConn.register(node);
         node.status({fill:"green",shape:"dot",text:"rpi-gpio.status.ok"});
@@ -108,9 +68,9 @@ module.exports = function(RED) {
             return
           }
           if(data.gpio_type===node.piModel){
-            this.topic = `tsa/gpio/${gpioMapping[node.piModel][node.pin].gpio}/value`
+            this.topic = `tsa/gpio/${gpioMapping[node.piModel][node.pin]}/value`
             this.brokerConn.publish({
-              topic: `tsa/gpio/${gpioMapping[node.piModel][node.pin].gpio}/setup`,
+              topic: `tsa/gpio/${gpioMapping[node.piModel][node.pin]}/setup`,
               qos: 0,
               retain: false,
               payload: JSON.stringify(setupParams)
@@ -187,7 +147,7 @@ module.exports = function(RED) {
           }
           if(data.gpio_type===node.piModel){
             node.brokerConn.publish({
-              topic: `tsa/gpio/${gpioMapping[node.piModel][node.pin].gpio}/setup`,
+              topic: `tsa/gpio/${gpioMapping[node.piModel][node.pin]}/setup`,
               qos: 0,
               retain: false,
               payload: JSON.stringify(setupParams)
@@ -218,7 +178,7 @@ module.exports = function(RED) {
                 }
                 if(data.gpio_type===node.piModel){
                   node.brokerConn.publish({
-                    topic: `tsa/gpio/${gpioMapping[node.piModel][node.pin].gpio}/value/set`,
+                    topic: `tsa/gpio/${gpioMapping[node.piModel][node.pin]}/value/set`,
                     qos: 0,
                     retain: false,
                     payload: `${out}`
